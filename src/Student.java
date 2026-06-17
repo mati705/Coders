@@ -9,6 +9,10 @@ public class Student {
         this.name = name;
         this.cgpa = cgpa;
     }
+    @Override
+    public int compareTo(Student other) {
+        return Double.compare(other.cgpa, this.cgpa);
+    }
 
     public int getStudentId() {
         return studentId;
