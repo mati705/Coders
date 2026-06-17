@@ -1,8 +1,8 @@
-public class Student {
+public class Student implements Comparable<Student> {
 
-    private int studentId;
-    private String name;
-    private double cgpa;
+    public int studentId;
+    public String name;
+    public double cgpa;
 
     public Student(int studentId, String name, double cgpa) {
         this.studentId = studentId;
