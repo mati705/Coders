@@ -1,82 +1,85 @@
-// Binary Search Tree (BST) - Academic Records
-
 public class AccedemicRecordBST {
 
-    public static class Node {
+    static class Node {
+        Student student;
+        Node left;
+        Node right;
 
-        public Student student;
-        public Node left, right;
-
-        public Node(Student s) {
-            this.student = s;
+        Node(Student student) {
+            this.student = student;
         }
     }
 
-    public Node root;
+    private Node root;
 
-    public void insert(Student s) {
-        root = insertRec(root, s);
-    }
-    public Node insertRec(Node node, Student s) {
-        if (node == null)
-            return new Node(s);
-
-        // Directly accessing studentId instead of using a getter
-        if (s.studentId < node.student.studentId)
-            node.left = insertRec(node.left, s);
-        else if (s.studentId > node.student.studentId)
-            node.right = insertRec(node.right, s);
-
-        return node;
+    public void insert(Student student) {
+        root = insertRec(root, student);
     }
 
-    public Student search(int studentId) {
+    private Node insertRec(Node current, Student student) {
+        if (current == null) {
+            return new Node(student);
+        }
+
+        int result = student.getStudentId().compareToIgnoreCase(current.student.getStudentId());
+
+        if (result < 0) {
+            current.left = insertRec(current.left, student);
+        } else if (result > 0) {
+            current.right = insertRec(current.right, student);
+        }
+
+        return current;
+    }
+
+    public Student search(String studentId) {
         return searchRec(root, studentId);
     }
 
-    public Student searchRec(Node node, int id) {
-        if (node == null)
+    private Student searchRec(Node current, String studentId) {
+        if (current == null) {
             return null;
+        }
 
+        int result = studentId.compareToIgnoreCase(current.student.getStudentId());
 
-        if (id == node.student.studentId)
-            return node.student;
-
-        if (id < node.student.studentId)
-            return searchRec(node.left, id);
-
-        return searchRec(node.right, id);
+        if (result == 0) {
+            return current.student;
+        } else if (result < 0) {
+            return searchRec(current.left, studentId);
+        } else {
+            return searchRec(current.right, studentId);
+        }
     }
 
-    public void inorder(Node node) {
-
-        if(node == null)
-            return;
-
-        inorder(node.left);
-        System.out.println(node.student);
-        inorder(node.right);
+    public void displayInOrder() {
+        System.out.println("\n--- BST Academic Records In Sorted Order ---");
+        inorder(root);
     }
 
-    public void preorder(Node node) {
-
-        if(node == null)
+    private void inorder(Node current) {
+        if (current == null) {
             return;
+        }
 
-        System.out.println(node.student);
-
-        preorder(node.left);
-        preorder(node.right);
+        inorder(current.left);
+        System.out.println(current.student);
+        inorder(current.right);
     }
 
-    public void postorder(Node node) {
+    public String getInOrderText() {
+        StringBuilder text = new StringBuilder();
+        makeInOrderText(root, text);
+        return text.toString();
+    }
 
-        if(node == null)
+    private void makeInOrderText(Node current, StringBuilder text) {
+        if (current == null) {
             return;
+        }
 
-        postorder(node.left);
-        postorder(node.right);
-
-        System.out.println(node.student);
+        makeInOrderText(current.left, text);
+        text.append(current.student).append("\n");
+        makeInOrderText(current.right, text);
     }
 }

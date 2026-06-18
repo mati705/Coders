@@ -1,0 +1,5 @@
+CS101|Programming Fundamentals|Monday 9-11
+CS201|Object Oriented Programming|Monday 11-1
+CS301|Data Structures|Tuesday 9-11
+CS401|Database Systems|Wednesday 10-12
+CS405|Software Engineering|Tuesday 9-11

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class main {
@@ -6,34 +7,90 @@ public class main {
 
         System.out.println("SMART UNIVERSITY COURSE MANAGEMENT SYSTEM");
 
-        Course c1 = new Course("CS101", "Programming Fundamentals", "Monday 9-11");
-        Course c2 = new Course("CS201", "Object Oriented Programming", "Monday 11-1");
-        Course c3 = new Course("CS301", "Data Structures", "Tuesday 9-11");
-        Course c4 = new Course("CS401", "Database Systems", "Wednesday 10-12");
-        Course c5 = new Course("CS405", "Software Engineering", "Tuesday 9-11");
+        // ---------------- FILE HANDLING OBJECT ----------------
+        FileHandling fileHandler = new FileHandling();
+        fileHandler.createFiles();
 
+        // ---------------- DATA STRUCTURE OBJECTS ----------------
+        ArrayListStorage arrayListStorage = new ArrayListStorage();
+        Fast_Lookup lookup = new Fast_Lookup();
+        AccedemicRecordBST bst = new AccedemicRecordBST();
+        Enrollment_History history = new Enrollment_History();
+        RegistrationQueue registrationQueue = new RegistrationQueue();
+        Continuous_Registration circularQueue = new Continuous_Registration(5);
+        PrerequisiteGraph graph = new PrerequisiteGraph();
+        DoublyLinkedListNavigation navigation = new DoublyLinkedListNavigation();
+        PriorityQueueManager priorityQueue = new PriorityQueueManager();
+        UndoActionImplementation undoStack = new UndoActionImplementation(10);
+
+        // ---------------- LOAD DATA FROM FILES ----------------
+        fileHandler.loadCourses(arrayListStorage, graph);
+        fileHandler.loadStudents(lookup, bst);
+        fileHandler.loadEnrollments(history);
+        fileHandler.loadPrerequisites(graph);
+        fileHandler.loadRegistrationRequests(registrationQueue, circularQueue);
+
+        // ---------------- SHOW LOADED DATA ----------------
+        System.out.println("\n--- Courses Loaded From File ---");
+        arrayListStorage.displayCourses();
+
+        System.out.println("\n--- Students Loaded in HashMap ---");
+        lookup.display();
+
+        System.out.println("\n--- Students Loaded in BST ---");
+        bst.displayInOrder();
+
+        System.out.println("\n--- Enrollment History Loaded ---");
+        history.displayHistory();
+
+        System.out.println("\n--- Prerequisite Graph Loaded ---");
+        graph.displayGraph();
+
+        System.out.println("\n--- Registration Queue Loaded ---");
+        registrationQueue.display();
+
+        System.out.println("\n--- Circular Queue Loaded ---");
+        circularQueue.display();
+
+        // ---------------- ADD SAMPLE DATA IF COURSE FILE IS EMPTY ----------------
+        if (arrayListStorage.getAll().size() == 0) {
+
+            System.out.println("\nNo courses found in file, adding sample courses for testing.");
+
+            Course c1 = new Course("CS101", "Programming Fundamentals", "Monday 9-11");
+            Course c2 = new Course("CS201", "Object Oriented Programming", "Monday 11-1");
+            Course c3 = new Course("CS301", "Data Structures", "Tuesday 9-11");
+            Course c4 = new Course("CS401", "Database Systems", "Wednesday 10-12");
+            Course c5 = new Course("CS405", "Software Engineering", "Tuesday 9-11");
+
+            arrayListStorage.addCourse(c1);
+            arrayListStorage.addCourse(c2);
+            arrayListStorage.addCourse(c3);
+            arrayListStorage.addCourse(c4);
+            arrayListStorage.addCourse(c5);
+
+            graph.addCourse("CS101");
+            graph.addCourse("CS201");
+            graph.addCourse("CS301");
+            graph.addCourse("CS401");
+            graph.addCourse("CS405");
+        }
+
+        // ---------------- SAMPLE STUDENTS FOR TESTING PRIORITY QUEUE ----------------
         Student s1 = new Student("SE-101", "Ali Khan", 3.60);
         Student s2 = new Student("SE-102", "Sara Ahmed", 3.85);
         Student s3 = new Student("SE-103", "Bilal Hussain", 3.25);
 
-        Course[] courses = {c1, c2, c3, c4, c5};
+        lookup.addStudent(s1);
+        lookup.addStudent(s2);
+        lookup.addStudent(s3);
 
-        System.out.println("\n--- All Courses ---");
-        for (int i = 0; i < courses.length; i++) {
-            System.out.println(courses[i]);
-        }
+        bst.insert(s1);
+        bst.insert(s2);
+        bst.insert(s3);
 
-        // 1. ArrayList
+        // ---------------- ARRAYLIST TESTING ----------------
         System.out.println("\n--- ArrayList Storage Testing ---");
-
-        ArrayListStorage arrayListStorage = new ArrayListStorage();
-
-        arrayListStorage.addCourse(c1);
-        arrayListStorage.addCourse(c2);
-        arrayListStorage.addCourse(c3);
-        arrayListStorage.addCourse(c4);
-        arrayListStorage.addCourse(c5);
-
         arrayListStorage.displayCourses();
 
         System.out.println("\nSearch Course CS301:");
@@ -45,10 +102,8 @@ public class main {
             System.out.println("Course not found.");
         }
 
-        // Singly Linked List
+        // ---------------- SINGLY LINKED LIST TESTING ----------------
         System.out.println("\n--- Enrollment History Singly Linked List Testing ---");
-
-        Enrollment_History history = new Enrollment_History();
 
         history.addRecord("CS101");
         history.addRecord("CS201");
@@ -72,29 +127,27 @@ public class main {
 
         System.out.println("Total Records: " + history.countRecords());
 
-
-        // 3. Doubly Linked List
+        // ---------------- DOUBLY LINKED LIST TESTING ----------------
         System.out.println("\n--- Doubly Linked List Course Navigation Testing ---");
 
-        DoublyLinkedListNavigation navigation = new DoublyLinkedListNavigation();
+        ArrayList<Course> courseList = arrayListStorage.getAll();
 
-        navigation.addCourse("CS101 - Programming Fundamentals");
-        navigation.addCourse("CS201 - Object Oriented Programming");
-        navigation.addCourse("CS301 - Data Structures");
-        navigation.addCourse("CS401 - Database Systems");
+        for (int i = 0; i < courseList.size(); i++) {
+            navigation.addCourse(courseList.get(i).toString());
+        }
 
         navigation.displayForward();
         navigation.displayBackward();
 
         System.out.println("Total Courses in Navigation: " + navigation.countCourses());
 
-        if (navigation.searchCourse("CS301 - Data Structures")) {
+        if (navigation.searchCourse("CS301 - Data Structures - Tuesday 9-11")) {
             System.out.println("Course found in navigation list.");
         } else {
             System.out.println("Course not found in navigation list.");
         }
 
-        navigation.deleteCourse("CS201 - Object Oriented Programming");
+        navigation.deleteCourse("CS201 - Object Oriented Programming - Monday 11-1");
 
         System.out.println("\nAfter deleting CS201:");
         navigation.displayForward();
@@ -102,32 +155,49 @@ public class main {
 
         System.out.println("Total Courses in Navigation: " + navigation.countCourses());
 
+        // ---------------- MAKE COURSE ARRAY FROM ARRAYLIST ----------------
+        Course[] courses = makeCourseArray(arrayListStorage);
 
+        System.out.println("\n--- All Courses From ArrayList ---");
+        for (int i = 0; i < courses.length; i++) {
+            System.out.println(courses[i]);
+        }
 
-
+        // ---------------- MERGE SORT ----------------
         System.out.println("\n--- Merge Sort Courses By Course ID ---");
-        Course[] mergeArray = {c1, c2, c3, c4, c5};
-        MergeSortCourses.sort(mergeArray, 0, mergeArray.length - 1);
-        MergeSortCourses.printCourses(mergeArray);
+        Course[] mergeArray = makeCourseArray(arrayListStorage);
 
+        if (mergeArray.length > 0) {
+            MergeSortCourses.sort(mergeArray, 0, mergeArray.length - 1);
+            MergeSortCourses.printCourses(mergeArray);
+        } else {
+            System.out.println("No courses available for merge sort.");
+        }
+
+        // ---------------- QUICK SORT ----------------
         System.out.println("\n--- Quick Sort Courses By Course Name ---");
-        Course[] quickArray = {c1, c2, c3, c4, c5};
-        QuickSortCourses.quickSort(quickArray, 0, quickArray.length - 1);
-        QuickSortCourses.printCourses(quickArray);
+        Course[] quickArray = makeCourseArray(arrayListStorage);
 
+        if (quickArray.length > 0) {
+            QuickSortCourses.quickSort(quickArray, 0, quickArray.length - 1);
+            QuickSortCourses.printCourses(quickArray);
+        } else {
+            System.out.println("No courses available for quick sort.");
+        }
+
+        // ---------------- HEAP SORT ----------------
         System.out.println("\n--- Heap Sort Courses By Course ID ---");
-        Course[] heapArray = {c1, c2, c3, c4, c5};
-        HeapSortCourses.heapSort(heapArray);
-        HeapSortCourses.printCourses(heapArray);
+        Course[] heapArray = makeCourseArray(arrayListStorage);
 
+        if (heapArray.length > 0) {
+            HeapSortCourses.heapSort(heapArray);
+            HeapSortCourses.printCourses(heapArray);
+        } else {
+            System.out.println("No courses available for heap sort.");
+        }
+
+        // ---------------- PREREQUISITE GRAPH TESTING ----------------
         System.out.println("\n--- Prerequisite Graph Testing ---");
-
-        PrerequisiteGraph graph = new PrerequisiteGraph();
-
-        graph.addCourse("CS101");
-        graph.addCourse("CS201");
-        graph.addCourse("CS301");
-        graph.addCourse("CS401");
 
         graph.addPrerequisite("CS201", "CS101");
         graph.addPrerequisite("CS301", "CS201");
@@ -151,9 +221,8 @@ public class main {
             System.out.println("Student cannot enroll in CS401.");
         }
 
+        // ---------------- PRIORITY QUEUE TESTING ----------------
         System.out.println("\n--- Priority Queue Waitlist Testing ---");
-
-        PriorityQueueManager priorityQueue = new PriorityQueueManager();
 
         priorityQueue.addStudent(String.valueOf(s1.getCgpa()), s1.getName());
         priorityQueue.addStudent(String.valueOf(s2.getCgpa()), s2.getName());
@@ -167,35 +236,27 @@ public class main {
 
         priorityQueue.peekNext();
 
+        // ---------------- NORMAL QUEUE TESTING ----------------
         System.out.println("\n--- Normal Registration Queue Testing ---");
-
-        RegistrationQueue registrationQueue = new RegistrationQueue();
 
         registrationQueue.addRequest("SE-101 requested CS101");
         registrationQueue.addRequest("SE-102 requested CS301");
         registrationQueue.addRequest("SE-103 requested CS401");
 
         registrationQueue.display();
-
         registrationQueue.peekNext();
-
         registrationQueue.totalRequests();
 
         registrationQueue.processNext();
 
         System.out.println("\nAfter Processing One Request:");
         registrationQueue.display();
-
         registrationQueue.peekNext();
-
         registrationQueue.totalRequests();
 
+        // ---------------- CIRCULAR QUEUE TESTING ----------------
         System.out.println("\n--- Circular Queue Continuous Registration Testing ---");
 
-        Continuous_Registration circularQueue = new Continuous_Registration(5);
-        circularQueue.enqueue("SE-101 requested CS101");
-        circularQueue.enqueue("SE-102 requested CS301");
-        circularQueue.enqueue("SE-103 requested CS401");
         circularQueue.enqueue("SE-104 requested CS201");
 
         circularQueue.display();
@@ -212,11 +273,8 @@ public class main {
         System.out.println("\nAfter Adding One More Request:");
         circularQueue.display();
 
-
-
+        // ---------------- UNDO STACK TESTING ----------------
         System.out.println("\n--- Undo Stack Testing ---");
-
-        UndoActionImplementation undoStack = new UndoActionImplementation(10);
 
         UndoAction a1 = new UndoAction("REGISTER", "SE-101", "CS301", "Registration done");
         UndoAction a2 = new UndoAction("DROP", "SE-102", "CS201", "Course dropped");
@@ -234,8 +292,8 @@ public class main {
         System.out.println("\nAfter Undo:");
         undoStack.displayStack();
 
-        System.out.println("\nPROJECT TESTING COMPLETED.");
-
+        // ---------------- TREESET TESTING ----------------
+        System.out.println("\n--- TreeSet Testing ---");
 
         TreeSetStudentRecords set = new TreeSetStudentRecords();
 
@@ -245,6 +303,9 @@ public class main {
 
         set.displayStudentIds();
 
+        // ---------------- TREEMAP TESTING ----------------
+        System.out.println("\n--- TreeMap Testing ---");
+
         TreeMapSemesterCourses map = new TreeMapSemesterCourses();
 
         map.addSemesterCourses(4, "DSA, Database Systems, Software Engineering");
@@ -252,5 +313,20 @@ public class main {
         map.addSemesterCourses(2, "OOP, Discrete Structures");
 
         map.displaySemesterCourses();
+
+        System.out.println("\nPROJECT TESTING COMPLETED.");
+    }
+
+    private static Course[] makeCourseArray(ArrayListStorage storage) {
+
+        ArrayList<Course> list = storage.getAll();
+
+        Course[] courses = new Course[list.size()];
+
+        for (int i = 0; i < list.size(); i++) {
+            courses[i] = list.get(i);
+        }
+
+        return courses;
     }
 }
