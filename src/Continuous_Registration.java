@@ -70,17 +70,6 @@ public class Continuous_Registration {
 
     }
 
-    // Search Feature: Returns position in line (1-indexed), or -1 if not found
-    public int getPosition(String studentId) {
-        int i = front;
-        for (int position = 1; position <= size; position++) {
-            if (arr[i].equals(studentId)) {
-                return position;
-            }
-            i = (i + 1) % capacity;
-        }
-        return -1;
-    }
 
     public void display() {
 

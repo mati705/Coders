@@ -1,27 +1,27 @@
 import java.util.HashMap;
 
 public class Fast_Lookup {
-    //HashMap - Fast Lookup for Students and Courses (O(1) access)
 
-    private HashMap<Integer, Student> studentMap = new HashMap<>();
+    // HashMap - Fast Lookup for Students using Student ID
+    private HashMap<String, Student> studentMap = new HashMap<>();
 
-    // Add a student using their ID as the unique key
+    // Add student using student ID as key
     public void addStudent(Student s) {
         studentMap.put(s.getStudentId(), s);
-        System.out.println("Registered student " + s.getName() + " in lookup system.");
+        System.out.println("Student added in lookup system: " + s.getName());
     }
 
-    public void searchStudent(int id) {
+    public void searchStudent(String id) {
         if (studentMap.containsKey(id)) {
             System.out.println("Student Found -> " + studentMap.get(id));
         } else {
-            System.out.println("Error: Student with ID " + id + " not found.");
+            System.out.println("Student with ID " + id + " not found.");
         }
     }
 
-    // Simple display to show all registered IDs
+    // Display all student IDs
     public void display() {
-        System.out.println("\n--- Fast Lookup (HashMap) ---");
-        System.out.println("Registered Student IDs: " + studentMap.keySet());
+        System.out.println("\n--- Fast Lookup using HashMap ---");
+        System.out.println("Student IDs: " + studentMap.keySet());
     }
 }
