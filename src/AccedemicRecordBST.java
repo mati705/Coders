@@ -1,6 +1,6 @@
 // Binary Search Tree (BST) - Academic Records
 
-public class AcemicRecordBST {
+public class AccedemicRecordBST {
 
     public static class Node {
 

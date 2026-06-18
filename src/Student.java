@@ -1,10 +1,10 @@
 public class Student implements Comparable<Student> {
 
-    public int studentId;
+    public String studentId;
     public String name;
     public double cgpa;
 
-    public Student(int studentId, String name, double cgpa) {
+    public Student(String studentId, String name, double cgpa) {
         this.studentId = studentId;
         this.name = name;
         this.cgpa = cgpa;
@@ -14,7 +14,7 @@ public class Student implements Comparable<Student> {
         return Double.compare(other.cgpa, this.cgpa);
     }
 
-    public int getStudentId() {
+    public String getStudentId() {
         return studentId;
     }
 

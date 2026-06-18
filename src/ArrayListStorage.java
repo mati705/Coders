@@ -9,6 +9,8 @@ public class ArrayListStorage {
     }
 
     public void addCourse(Course course) {
+
+
         courses.add(course);
     }
 
