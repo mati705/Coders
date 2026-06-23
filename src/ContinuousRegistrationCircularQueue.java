@@ -1,6 +1,10 @@
 public class ContinuousRegistrationCircularQueue {
+
     private String[] arr;
-    private int front, rear, size, capacity;
+    private int front;
+    private int rear;
+    private int size;
+    private int capacity;
 
     public ContinuousRegistrationCircularQueue(int capacity) {
         this.capacity = capacity;
@@ -18,73 +22,70 @@ public class ContinuousRegistrationCircularQueue {
         return size == capacity;
     }
 
-    // Look at the next student in line without removing them
     public String peek() {
-        if (isEmpty()) return null;
+        if (isEmpty()) {
+            return null;
+        }
+
         return arr[front];
     }
 
-    // Dynamic Resizing: Doubles the queue capacity when full
     private void resize() {
         int newCapacity = capacity * 2;
         String[] newArr = new String[newCapacity];
 
-        int i = front;
-        for (int n = 0; n < size; n++) {
-            newArr[n] = arr[i];
-            i = (i + 1) % capacity;
+        int index = front;
+
+        for (int i = 0; i < size; i++) {
+            newArr[i] = arr[index];
+            index = (index + 1) % capacity;
         }
 
-        this.arr = newArr;
-        this.front = 0;
-        this.rear = size - 1;
-        this.capacity = newCapacity;
-        System.out.println(">> Queue automatically resized to capacity: " + newCapacity);
+        arr = newArr;
+        front = 0;
+        rear = size - 1;
+        capacity = newCapacity;
     }
 
     public boolean enqueue(String studentId) {
-
-        if (size == capacity) {
-            System.out.println("Circular Queue FULL. Cannot add " + studentId);
-
-            return false;
-
+        if (isFull()) {
+            resize();
         }
 
         rear = (rear + 1) % capacity;
         arr[rear] = studentId;
         size++;
         return true;
-
     }
 
-
     public String dequeue() {
+        if (isEmpty()) {
+            return null;
+        }
 
-        if (size == 0) return null;
-        String s = arr[front];
+        String value = arr[front];
+        arr[front] = null;
         front = (front + 1) % capacity;
         size--;
 
-        return s;
-
+        return value;
     }
 
-
     public void display() {
+        System.out.println("\n--- Continuous Registration Circular Queue ---");
 
-        System.out.println("\n--- Continuous Registration (Circular Queue) ---");
-        int i = front;
+        if (isEmpty()) {
+            System.out.println("Queue is empty.");
+            return;
+        }
 
-        for (int n = 0; n < size; n++) {
+        int index = front;
 
-            System.out.print(arr[i] + " ");
-            i = (i + 1) % capacity;
-
+        for (int i = 0; i < size; i++) {
+            System.out.print(arr[index] + " ");
+            index = (index + 1) % capacity;
         }
 
         System.out.println();
-
     }
-
 }

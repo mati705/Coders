@@ -5,40 +5,40 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class SimpleUniversityDashboard extends JFrame {
+public class UniversityDashboardGUI extends JFrame {
 
-    private ArrayListStorage courseStorage;
-    private Fast_Lookup lookup;
+    private CourseCatalogArrayList courseStorage;
+    private StudentHashMapLookup lookup;
     private AccedemicRecordBST bst;
     private Enrollment_History history;
     private RegistrationQueue registrationQueue;
-    private Continuous_Registration circularQueue;
+    private ContinuousRegistrationCircularQueue circularQueue;
     private PrerequisiteGraph graph;
-    private PriorityQueueManager priorityQueue;
+    private WaitlistPriorityQueue priorityQueue;
     private UndoActionImplementation undoStack;
-    private ScheduleOptimizer optimizer;
-    private FileHandling fileHandler;
+    private GreedyScheduleOptimizer optimizer;
+    private UniversityFileManager fileHandler;
 
     private JTextArea outputArea;
 
-    public SimpleUniversityDashboard() {
+    public UniversityDashboardGUI() {
 
-        fileHandler = new FileHandling();
+        fileHandler = new UniversityFileManager();
         fileHandler.createFiles();
 
-        courseStorage = new ArrayListStorage();
-        lookup = new Fast_Lookup();
+        courseStorage = new CourseCatalogArrayList();
+        lookup = new StudentHashMapLookup();
         bst = new AccedemicRecordBST();
         history = new Enrollment_History();
         registrationQueue = new RegistrationQueue();
-        circularQueue = new Continuous_Registration(5);
+        circularQueue = new ContinuousRegistrationCircularQueue(5);
         graph = new PrerequisiteGraph();
-        priorityQueue = new PriorityQueueManager();
+        priorityQueue = new WaitlistPriorityQueue();
         undoStack = new UndoActionImplementation(10);
-        optimizer = new ScheduleOptimizer();
+        optimizer = new GreedyScheduleOptimizer();
 
         setTitle("Smart University Course Management System");
-        setSize(900, 600);
+        setSize(950, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -65,7 +65,7 @@ public class SimpleUniversityDashboard extends JFrame {
         tabs.addTab("Prerequisites", createPrerequisitePanel());
         tabs.addTab("Algorithms", createAlgorithmPanel());
 
-        outputArea = new JTextArea(8, 50);
+        outputArea = new JTextArea(10, 50);
         outputArea.setEditable(false);
         outputArea.setFont(new Font("Consolas", Font.PLAIN, 14));
 
@@ -80,6 +80,13 @@ public class SimpleUniversityDashboard extends JFrame {
     }
 
     private void loadDataFromFiles() {
+
+        /*
+           These methods must exist in UniversityFileManager.java.
+           If your UniversityFileManager.java still uses old names like
+           ArrayListStorage or Fast_Lookup, change those method parameters
+           to CourseCatalogArrayList and StudentHashMapLookup.
+        */
 
         fileHandler.loadCourses(courseStorage, graph);
         fileHandler.loadStudents(lookup, bst);
@@ -135,6 +142,13 @@ public class SimpleUniversityDashboard extends JFrame {
                     return;
                 }
 
+                Course alreadyExists = courseStorage.findById(id);
+
+                if (alreadyExists != null) {
+                    show("Course ID already exists.");
+                    return;
+                }
+
                 Course course = new Course(id, name, time);
 
                 courseStorage.addCourse(course);
@@ -155,6 +169,11 @@ public class SimpleUniversityDashboard extends JFrame {
                 outputArea.setText("--- Courses Stored in ArrayList ---\n");
 
                 ArrayList<Course> list = courseStorage.getAll();
+
+                if (list.size() == 0) {
+                    outputArea.append("No courses available.\n");
+                    return;
+                }
 
                 for (int i = 0; i < list.size(); i++) {
                     outputArea.append(list.get(i) + "\n");
@@ -233,6 +252,11 @@ public class SimpleUniversityDashboard extends JFrame {
 
                     double cgpa = Double.parseDouble(cgpaText);
 
+                    if (cgpa < 0.0 || cgpa > 4.0) {
+                        show("CGPA must be between 0.0 and 4.0.");
+                        return;
+                    }
+
                     Student student = new Student(id, name, cgpa);
 
                     lookup.addStudent(student);
@@ -262,15 +286,29 @@ public class SimpleUniversityDashboard extends JFrame {
                 }
 
                 lookup.searchStudent(id);
-                show("Student search done using HashMap. Check console for result.");
+
+                Student found = bst.search(id);
+
+                if (found != null) {
+                    show("Student found: " + found);
+                } else {
+                    show("Student not found.");
+                }
             }
         });
 
         showButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                bst.displayInOrder();
-                show("BST records displayed in console.");
+                outputArea.setText("--- BST Academic Records In Sorted Order ---\n");
+
+                String records = bst.getInOrderText();
+
+                if (records.equals("")) {
+                    outputArea.append("No student records available.\n");
+                } else {
+                    outputArea.append(records);
+                }
             }
         });
 
@@ -319,10 +357,16 @@ public class SimpleUniversityDashboard extends JFrame {
                 String request = studentId + " requested " + courseId;
 
                 registrationQueue.addRequest(request);
-                circularQueue.enqueue(request);
+
+                boolean addedInCircularQueue = circularQueue.enqueue(request);
+
+                if (!addedInCircularQueue) {
+                    show("Normal queue request added, but circular queue is full.");
+                }
+
                 fileHandler.saveRegistrationRequest(request);
 
-                show("Request added in Queue, Circular Queue and file: " + request);
+                show("Request added in Queue and file: " + request);
             }
         });
 
@@ -350,6 +394,20 @@ public class SimpleUniversityDashboard extends JFrame {
                     return;
                 }
 
+                Course course = courseStorage.findById(courseId);
+
+                if (course == null) {
+                    show("Course does not exist. Add course first.");
+                    return;
+                }
+
+                Student student = bst.search(studentId);
+
+                if (student == null) {
+                    show("Student does not exist. Add student first.");
+                    return;
+                }
+
                 history.addRecord(courseId);
                 fileHandler.saveEnrollment(studentId, courseId);
 
@@ -364,7 +422,7 @@ public class SimpleUniversityDashboard extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 undoStack.undoLastAction();
-                show("Undo operation performed. Check console.");
+                show("Undo operation performed. Check console for undo details.");
             }
         });
 
@@ -460,7 +518,7 @@ public class SimpleUniversityDashboard extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 graph.displayGraph();
-                show("Graph displayed in console.");
+                show("Prerequisite graph displayed in console.");
             }
         });
 
@@ -572,11 +630,23 @@ public class SimpleUniversityDashboard extends JFrame {
                     return;
                 }
 
-                priorityQueue.addStudent(cgpa, name);
-                show("Student added to Priority Queue waitlist: " + name);
+                try {
+                    double value = Double.parseDouble(cgpa);
 
-                waitNameField.setText("");
-                waitCgpaField.setText("");
+                    if (value < 0.0 || value > 4.0) {
+                        show("CGPA must be between 0.0 and 4.0.");
+                        return;
+                    }
+
+                    priorityQueue.addStudent(cgpa, name);
+                    show("Student added to Priority Queue waitlist: " + name);
+
+                    waitNameField.setText("");
+                    waitCgpaField.setText("");
+
+                } catch (NumberFormatException ex) {
+                    show("CGPA must be a number.");
+                }
             }
         });
 
@@ -608,13 +678,17 @@ public class SimpleUniversityDashboard extends JFrame {
 
         outputArea.setText("--- " + title + " ---\n");
 
+        if (courses.length == 0) {
+            outputArea.append("No courses available.\n");
+            return;
+        }
+
         for (int i = 0; i < courses.length; i++) {
             outputArea.append(courses[i] + "\n");
         }
     }
 
     private void show(String message) {
-
         outputArea.append(message + "\n");
     }
 }

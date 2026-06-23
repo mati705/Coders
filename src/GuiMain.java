@@ -6,7 +6,7 @@ public class GuiMain {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                SimpleUniversityDashboard dashboard = new SimpleUniversityDashboard();
+                UniversityDashboardGUI dashboard = new UniversityDashboardGUI();
                 dashboard.setVisible(true);
             }
         });

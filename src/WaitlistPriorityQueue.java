@@ -1,30 +1,45 @@
+import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.util.Collections;
-// Priority Queue - Waitlist System
 
 public class WaitlistPriorityQueue {
 
-    // Adding Collections.reverseOrder() makes the highest CGPA come out first
+    private PriorityQueue<Student> waitList = new PriorityQueue<>(
+            new Comparator<Student>() {
+                @Override
+                public int compare(Student s1, Student s2) {
+                    return Double.compare(s2.getCgpa(), s1.getCgpa());
+                }
+            }
+    );
 
-    private PriorityQueue<String> waitList = new PriorityQueue<>(Collections.reverseOrder());
-
-
-    public void addStudent(String cgpa, String studentName) {
-        String entry = cgpa + " - " + studentName;
-        waitList.offer(entry);
-        System.out.println(studentName + " (" + cgpa + ") added to waitlist.");
+    public void addStudent(Student student) {
+        waitList.offer(student);
+        System.out.println(student.getName() + " added to waitlist. CGPA: " + student.getCgpa());
     }
 
-    public void assignSeat() {
+    // Kept for your GUI buttons
+    public void addStudent(String cgpa, String studentName) {
+        double studentCgpa = Double.parseDouble(cgpa);
+        Student student = new Student("WAIT-" + studentName.replace(" ", ""), studentName, studentCgpa);
+        addStudent(student);
+    }
+
+    public Student assignSeatStudent() {
         if (waitList.isEmpty()) {
             System.out.println("Waitlist is empty!");
-            return;
+            return null;
         }
 
-        System.out.println("Assigned Seat to: " + waitList.poll());
+        Student student = waitList.poll();
+        System.out.println("Assigned Seat to: " + student);
+        return student;
     }
 
-    // A simple check method to see who is next without removing them
+    // Kept for your GUI buttons
+    public void assignSeat() {
+        assignSeatStudent();
+    }
+
     public void peekNext() {
         if (waitList.isEmpty()) {
             System.out.println("Waitlist is empty!");

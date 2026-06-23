@@ -4,14 +4,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class UniversityFileManager{
+public class UniversityFileManager {
 
-    private String studentFile = "students.txt";
-    private String courseFile = "courses.txt";
-    private String enrollmentFile = "enrollments.txt";
-    private String prerequisiteFile = "prerequisites.txt";
-    private String registrationFile = "registrations.txt";
+    private final String studentFile = "students.txt";
+    private final String courseFile = "courses.txt";
+    private final String enrollmentFile = "enrollments.txt";
+    private final String prerequisiteFile = "prerequisites.txt";
+    private final String registrationFile = "registrations.txt";
 
     public void createFiles() {
         createOneFile(studentFile);
@@ -28,52 +29,35 @@ public class UniversityFileManager{
             if (!file.exists()) {
                 file.createNewFile();
             }
-
         } catch (IOException e) {
             System.out.println("File creation error: " + fileName);
         }
     }
 
-    // -------------------- STUDENTS --------------------
-
     public void saveStudent(Student student) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(studentFile, true));
-
-            writer.write(student.getStudentId() + "|" + student.getName() + "|" + student.getCgpa());
-            writer.newLine();
-
-            writer.close();
-
-        } catch (IOException e) {
-            System.out.println("Student save error.");
-        }
+        appendLine(studentFile, student.getStudentId() + "|" + student.getName() + "|" + student.getCgpa());
     }
 
     public void loadStudents(StudentHashMapLookup lookup, AccedemicRecordBST bst) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(studentFile));
-
             String line;
 
             while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("")) {
+                    continue;
+                }
 
                 String[] data = line.split("\\|");
 
                 if (data.length == 3) {
-                    String id = data[0];
-                    String name = data[1];
-                    double cgpa = Double.parseDouble(data[2]);
-
-                    Student student = new Student(id, name, cgpa);
-
+                    Student student = new Student(data[0], data[1], Double.parseDouble(data[2]));
                     lookup.addStudent(student);
                     bst.insert(student);
                 }
             }
 
             reader.close();
-
         } catch (IOException e) {
             System.out.println("Student load error.");
         } catch (NumberFormatException e) {
@@ -81,162 +65,211 @@ public class UniversityFileManager{
         }
     }
 
-    // -------------------- COURSES --------------------
-
     public void saveCourse(Course course) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(courseFile, true));
-
-            writer.write(course.getCourseId() + "|" + course.getCourseName() + "|" + course.getTimeSlot());
-            writer.newLine();
-
-            writer.close();
-
-        } catch (IOException e) {
-            System.out.println("Course save error.");
-        }
+        appendLine(courseFile, course.toFileString());
     }
 
     public void loadCourses(CourseCatalogArrayList storage, PrerequisiteGraph graph) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(courseFile));
-
             String line;
 
             while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("")) {
+                    continue;
+                }
 
-                String[] data = line.split("\\|");
+                Course course = parseCourse(line);
 
-                if (data.length == 3) {
-                    String id = data[0];
-                    String name = data[1];
-                    String time = data[2];
-
-                    Course course = new Course(id, name, time);
-
+                if (course != null) {
                     storage.addCourse(course);
-                    graph.addCourse(id);
+                    graph.addCourse(course.getCourseId());
                 }
             }
 
             reader.close();
-
         } catch (IOException e) {
             System.out.println("Course load error.");
         }
     }
 
-    // -------------------- ENROLLMENTS --------------------
-
-    public void saveEnrollment(String studentId, String courseId) {
+    private Course parseCourse(String line) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(enrollmentFile, true));
+            String[] data = line.split("\\|");
 
-            writer.write(studentId + "|" + courseId);
-            writer.newLine();
+            if (data.length == 3) {
+                return new Course(data[0], data[1], data[2]);
+            }
+
+            if (data.length >= 6) {
+                return new Course(
+                        data[0],
+                        data[1],
+                        data[2]
+                );
+            }
+        } catch (Exception e) {
+            System.out.println("Invalid course line skipped: " + line);
+        }
+
+        return null;
+    }
+
+    public void rewriteCourses(CourseCatalogArrayList storage) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(courseFile, false));
+            ArrayList<Course> courses = storage.getAll();
+
+            for (Course course : courses) {
+                writer.write(course.toFileString());
+                writer.newLine();
+            }
 
             writer.close();
-
         } catch (IOException e) {
-            System.out.println("Enrollment save error.");
+            System.out.println("Course rewrite error.");
         }
+    }
+
+    public void saveEnrollment(String studentId, String courseId) {
+        appendLine(enrollmentFile, studentId + "|" + courseId);
     }
 
     public void loadEnrollments(Enrollment_History history) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(enrollmentFile));
-
             String line;
 
             while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("")) {
+                    continue;
+                }
 
                 String[] data = line.split("\\|");
 
                 if (data.length == 2) {
-                    String courseId = data[1];
-                    history.addRecord(courseId);
+                    history.addRecord(data[1]);
                 }
             }
 
             reader.close();
-
         } catch (IOException e) {
             System.out.println("Enrollment load error.");
         }
     }
 
-    // -------------------- PREREQUISITES --------------------
+    public void loadEnrollments(Enrollment_History history,
+                                StudentEnrollmentHashMap enrollmentMap,
+                                CourseCatalogArrayList storage) {
 
-    public void savePrerequisite(String courseId, String requiredCourse) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(prerequisiteFile, true));
+            BufferedReader reader = new BufferedReader(new FileReader(enrollmentFile));
+            String line;
 
-            writer.write(courseId + "|" + requiredCourse);
-            writer.newLine();
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("")) {
+                    continue;
+                }
+
+                String[] data = line.split("\\|");
+
+                if (data.length == 2) {
+                    String studentId = data[0];
+                    String courseId = data[1];
+                    Course course = storage.findById(courseId);
+
+                    history.addRecord(courseId);
+
+                    if (course != null && !enrollmentMap.isAlreadyEnrolled(studentId, courseId)) {
+                        enrollmentMap.enrollStudent(studentId, course);
+                        course.enrollOneSeat();
+                    }
+                }
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Enrollment load error.");
+        }
+    }
+
+    public void rewriteEnrollments(StudentEnrollmentHashMap enrollmentMap) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(enrollmentFile, false));
+            ArrayList<String> lines = enrollmentMap.getAllEnrollmentLines();
+
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
 
             writer.close();
-
         } catch (IOException e) {
-            System.out.println("Prerequisite save error.");
+            System.out.println("Enrollment rewrite error.");
         }
+    }
+
+    public void savePrerequisite(String courseId, String requiredCourse) {
+        appendLine(prerequisiteFile, courseId + "|" + requiredCourse);
     }
 
     public void loadPrerequisites(PrerequisiteGraph graph) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(prerequisiteFile));
-
             String line;
 
             while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("")) {
+                    continue;
+                }
 
                 String[] data = line.split("\\|");
 
                 if (data.length == 2) {
-                    String courseId = data[0];
-                    String requiredCourse = data[1];
-
-                    graph.addPrerequisite(courseId, requiredCourse);
+                    graph.addPrerequisite(data[0], data[1]);
                 }
             }
 
             reader.close();
-
         } catch (IOException e) {
             System.out.println("Prerequisite load error.");
         }
     }
 
-    // -------------------- REGISTRATION REQUESTS --------------------
-
     public void saveRegistrationRequest(String request) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(registrationFile, true));
-
-            writer.write(request);
-            writer.newLine();
-
-            writer.close();
-
-        } catch (IOException e) {
-            System.out.println("Registration request save error.");
-        }
+        appendLine(registrationFile, request);
     }
 
-    public void loadRegistrationRequests(RegistrationQueue queue, ContinuousRegistrationCircularQueue circularQueue) {
+    public void loadRegistrationRequests(RegistrationQueue queue,
+                                         ContinuousRegistrationCircularQueue circularQueue) {
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(registrationFile));
-
             String line;
 
             while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("")) {
+                    continue;
+                }
+
                 queue.addRequest(line);
                 circularQueue.enqueue(line);
             }
 
             reader.close();
-
         } catch (IOException e) {
             System.out.println("Registration request load error.");
+        }
+    }
+
+    private void appendLine(String fileName, String line) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true));
+            writer.write(line);
+            writer.newLine();
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("File save error: " + fileName);
         }
     }
 }

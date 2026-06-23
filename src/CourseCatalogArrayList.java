@@ -1,7 +1,7 @@
 import java.util.ArrayList;
-// Stores all available courses. Easy add / remove / iterate.
 
 public class CourseCatalogArrayList {
+
     private ArrayList<Course> courses;
 
     public CourseCatalogArrayList() {
@@ -9,9 +9,9 @@ public class CourseCatalogArrayList {
     }
 
     public void addCourse(Course course) {
-
-
-        courses.add(course);
+        if (findById(course.getCourseId()) == null) {
+            courses.add(course);
+        }
     }
 
     public Course getCourse(int index) {
@@ -20,8 +20,9 @@ public class CourseCatalogArrayList {
 
     public Course findById(String courseId) {
         for (Course c : courses) {
-            if (c.getCourseId().equals(courseId))
+            if (c.getCourseId().equalsIgnoreCase(courseId)) {
                 return c;
+            }
         }
         return null;
     }
@@ -31,7 +32,8 @@ public class CourseCatalogArrayList {
     }
 
     public void displayCourses() {
-        for(Course c : courses) {
+        System.out.println("\n--- Course Catalog using ArrayList ---");
+        for (Course c : courses) {
             System.out.println(c);
         }
     }
