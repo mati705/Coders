@@ -1,4 +1,4 @@
-public class ScheduleOptimizer {
+public class GreedyScheduleOptimizer {
 
     public Course[] makeSchedule(Course[] courses) {
 

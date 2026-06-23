@@ -2,7 +2,7 @@ import java.util.PriorityQueue;
 import java.util.Collections;
 // Priority Queue - Waitlist System
 
-public class PriorityQueueManager {
+public class WaitlistPriorityQueue {
 
     // Adding Collections.reverseOrder() makes the highest CGPA come out first
 

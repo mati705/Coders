@@ -1,6 +1,6 @@
 import java.util.TreeSet;
 
-public class TreeSetStudentRecords {
+public class StudentIdTreeSet {
 
     private TreeSet<String> studentIds = new TreeSet<>();
 

@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class FileHandling{
+public class UniversityFileManager{
 
     private String studentFile = "students.txt";
     private String courseFile = "courses.txt";
@@ -50,7 +50,7 @@ public class FileHandling{
         }
     }
 
-    public void loadStudents(Fast_Lookup lookup, AccedemicRecordBST bst) {
+    public void loadStudents(StudentHashMapLookup lookup, AccedemicRecordBST bst) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(studentFile));
 
@@ -97,7 +97,7 @@ public class FileHandling{
         }
     }
 
-    public void loadCourses(ArrayListStorage storage, PrerequisiteGraph graph) {
+    public void loadCourses(CourseCatalogArrayList storage, PrerequisiteGraph graph) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(courseFile));
 
@@ -222,7 +222,7 @@ public class FileHandling{
         }
     }
 
-    public void loadRegistrationRequests(RegistrationQueue queue, Continuous_Registration circularQueue) {
+    public void loadRegistrationRequests(RegistrationQueue queue, ContinuousRegistrationCircularQueue circularQueue) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(registrationFile));
 

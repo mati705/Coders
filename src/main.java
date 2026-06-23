@@ -8,19 +8,19 @@ public class main {
         System.out.println("SMART UNIVERSITY COURSE MANAGEMENT SYSTEM");
 
         // ---------------- FILE HANDLING OBJECT ----------------
-        FileHandling fileHandler = new FileHandling();
+        UniversityFileManager fileHandler = new UniversityFileManager();
         fileHandler.createFiles();
 
         // ---------------- DATA STRUCTURE OBJECTS ----------------
-        ArrayListStorage arrayListStorage = new ArrayListStorage();
-        Fast_Lookup lookup = new Fast_Lookup();
+        CourseCatalogArrayList arrayListStorage = new CourseCatalogArrayList();
+        StudentHashMapLookup lookup = new StudentHashMapLookup();
         AccedemicRecordBST bst = new AccedemicRecordBST();
         Enrollment_History history = new Enrollment_History();
         RegistrationQueue registrationQueue = new RegistrationQueue();
-        Continuous_Registration circularQueue = new Continuous_Registration(5);
+        ContinuousRegistrationCircularQueue circularQueue = new ContinuousRegistrationCircularQueue(5);
         PrerequisiteGraph graph = new PrerequisiteGraph();
-        DoublyLinkedListNavigation navigation = new DoublyLinkedListNavigation();
-        PriorityQueueManager priorityQueue = new PriorityQueueManager();
+        CourseNavigationDoublyLinkedList navigation = new CourseNavigationDoublyLinkedList();
+        WaitlistPriorityQueue priorityQueue = new WaitlistPriorityQueue();
         UndoActionImplementation undoStack = new UndoActionImplementation(10);
 
         // ---------------- LOAD DATA FROM FILES ----------------
@@ -295,7 +295,7 @@ public class main {
         // ---------------- TREESET TESTING ----------------
         System.out.println("\n--- TreeSet Testing ---");
 
-        TreeSetStudentRecords set = new TreeSetStudentRecords();
+        StudentIdTreeSet set = new StudentIdTreeSet();
 
         set.addStudentId("SE-103");
         set.addStudentId("SE-101");
@@ -306,7 +306,7 @@ public class main {
         // ---------------- TREEMAP TESTING ----------------
         System.out.println("\n--- TreeMap Testing ---");
 
-        TreeMapSemesterCourses map = new TreeMapSemesterCourses();
+        SemesterCourseTreeMap map = new SemesterCourseTreeMap();
 
         map.addSemesterCourses(4, "DSA, Database Systems, Software Engineering");
         map.addSemesterCourses(1, "Programming Fundamentals, English");
@@ -317,7 +317,7 @@ public class main {
         System.out.println("\nPROJECT TESTING COMPLETED.");
     }
 
-    private static Course[] makeCourseArray(ArrayListStorage storage) {
+    private static Course[] makeCourseArray(CourseCatalogArrayList storage) {
 
         ArrayList<Course> list = storage.getAll();
 

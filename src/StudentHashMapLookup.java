@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-public class Fast_Lookup {
+public class StudentHashMapLookup {
 
     // HashMap - Fast Lookup for Students using Student ID
     private HashMap<String, Student> studentMap = new HashMap<>();

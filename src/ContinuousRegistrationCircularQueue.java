@@ -1,8 +1,8 @@
-public class Continuous_Registration {
+public class ContinuousRegistrationCircularQueue {
     private String[] arr;
     private int front, rear, size, capacity;
 
-    public Continuous_Registration(int capacity) {
+    public ContinuousRegistrationCircularQueue(int capacity) {
         this.capacity = capacity;
         arr = new String[capacity];
         front = 0;

@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 // Stores all available courses. Easy add / remove / iterate.
 
-public class ArrayListStorage {
+public class CourseCatalogArrayList {
     private ArrayList<Course> courses;
 
-    public ArrayListStorage() {
+    public CourseCatalogArrayList() {
         courses = new ArrayList<>();
     }
 

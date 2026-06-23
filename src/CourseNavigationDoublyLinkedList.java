@@ -1,5 +1,5 @@
 // Student can move forward and backward through courses.
-public class DoublyLinkedListNavigation {
+public class CourseNavigationDoublyLinkedList {
 
     class Node {
 
